@@ -1076,7 +1076,83 @@ methods: {
 </style>
 ```
 
-16、max采用watch实现
+## 16、购物车小球动画
+
+知识点：
+
+- left和top的使用
+- ref属性获取位置
+- ref属性只能获取当前组件的位置，虽然vue不建议操作dom，但是原生js最容易，所以原生js获取购物车图标的位置
+
+```vue
+<!--加入购物车动画小球-->
+<transition
+  @before-enter="beforeEnter"
+  @enter="enter"
+  @after-enter="afterEnter">
+  <div class="ball" v-show="ballFlag" ref="ball" ></div>	<!--注意ref属性-->
+</transition>
+
+<style>
+  .goodsinfo-container {
+    .ball {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background-color: red;
+      position: absolute;
+      z-index: 99;
+      top: 390px; // 设置与最上边的距离（不论你怎么滑，里最上面都是这样的）
+      left: 146px;  // 设置与最左边的距离
+    }
+  }
+</style>
+
+
+<script>
+methods: {
+    addCart(){
+        // 商品添加到购物车
+        this.$emit('func',this.selectedCount);
+
+        this.ballFlag = !this.ballFlag;
+    },
+        beforeEnter(el) {
+            const ballPosition = document.getElementsByClassName("van-stepper__input")[0].getBoundingClientRect();
+
+            el.style.transform = "translate(0, 0)"; // 小球初始偏移量
+        },
+            enter(el, done) {
+                el.offsetWidth;
+
+                // 小球动画优化思路：
+                // 1. 先分析导致 动画 不准确的 本质原因： 我们把 小球 最终 位移到的 位置，已经局限在了某一分辨率下的 滚动条未滚动的情况下；
+                // 2. 只要分辨率和 测试的时候不一样，或者 滚动条有一定的滚动距离之后， 问题就出现了；
+                // 3. 因此，我们经过分析，得到结论： 不能把 位置的 横纵坐标 直接写死了，而是应该 根据不同情况，动态计算这个坐标值；
+                // 4. 经过分析，得出解题思路： 先得到 徽标的 横纵 坐标，再得到 小球的 横纵坐标，然后 让 y 值 求差， x 值也求 差，得到 的结果，就是横纵坐标要位移的距离
+                // 5. 如何 获取 徽标和小球的 位置？？？   domObject.getBoundingClientRect()
+
+                // 获取小球的 在页面中的位置
+                const ballPosition = this.$refs.ball.getBoundingClientRect();
+
+                // 获取 徽标 在页面中的位置
+                const badgePosition = document.getElementById("badge").getBoundingClientRect();
+
+                console.log(badgePosition)
+
+                const xDist = badgePosition.left - ballPosition.left;
+                const yDist = badgePosition.top - ballPosition.top;
+
+                el.style.transform = `translate(${xDist}px, ${yDist}px)`;
+                el.style.transition = "all 0.5s cubic-bezier(.4,-0.3,1,.68)";
+                done();
+            },
+                afterEnter(el) {
+                    this.ballFlag = !this.ballFlag;
+                },
+},
+</script>
+```
 
 ## 17、子组件向父组件传递值（实现toolbar端购物车数字的变化）
 
@@ -1084,4 +1160,93 @@ methods: {
 
 ![image-20181130171901594](https://ws1.sinaimg.cn/large/006tNbRwly1fxq7legvh7j30u00y0gua.jpg)
 
-18、动画
+## 18、vuex的使用，添加购物车案例
+
+Main.js
+
+```js
+// vuex
+import Vuex from 'vuex'
+Vue.use(Vuex)
+
+// 每次刚进入 网站，肯定会 调用 main.js 在刚调用的时候，先从本地存储中，把 购物车的数据读出来，放到 store 中
+var car = JSON.parse(localStorage.getItem('car') || '[]')
+
+var store = new Vuex.Store({
+  state: {
+    car: car
+  },
+  mutations: {
+
+    addToCar(state,obj){
+      var flag = false;
+
+      // 对数组中的每个元素都执行一次指定的函数（callback），直到此函数返回 true，如果发现这个元素，some 将返回 true，如果回调函数对每个元素执行后都返回 false ，some 将返回 false。它只对数组中的非空元素执行指定的函数，没有赋值或者已经删除的元素将被忽略。
+
+      // 1. 如果购物车中，之前就已经有这个对应的商品了，那么，只需要更新数量
+      state.car.some(item => {
+        if (item.id === obj.id) {
+          item.count += obj.count;  // 修改购物车商品数量
+          flag = true;
+          return true
+        }
+      });
+      // 2. 如果没有，则直接把 商品数据，push 到 car 中即可
+      if (!flag){
+        state.car.push(obj)
+      }
+
+      // 3.当更新car之后，把car数组，存储到本地的localStorage中
+      localStorage.setItem('car', JSON.stringify(state.car))
+
+    }
+  },
+  getters: {
+    getCount: function (state) {
+      var num = 0;
+
+      state.car.forEach(item => {
+        num += item.count;
+      });
+
+      return num;
+    }
+  }
+});
+```
+
+ShopInfo.vue在点击添加购物车时调用
+
+```js
+addCart(){
+  // 商品添加到购物车
+  this.$emit('func',this.selectedCount);
+
+  this.ballFlag = !this.ballFlag;
+
+
+  // 将商品数据加入store中
+  // 拼接出一个，要保存到 store 中 car 数组里的 商品信息对象
+  var goodsinfo = {
+    id: this.id,
+    count: this.selectedCount,
+    price: this.goodsinfo.sell_price,
+    selected: true
+  };
+  // 调用 store 中的 mutations 来将商品加入购物车
+  this.$store.commit("addToCar", goodsinfo);
+
+},
+```
+
+废弃之前的向父组件传参，，提供getter方法
+
+```vue
+<router-link class="mui-tab-item" to="/shopcar">
+    <span class="mui-icon mui-icon-extra mui-icon-extra-cart">
+     <span class="mui-badge" id="badge">{{ $store.getters.getCount }}</span>
+    </span>
+    <span class="mui-tab-label">购物车</span>
+</router-link>
+```
+
