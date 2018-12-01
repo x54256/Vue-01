@@ -9,6 +9,8 @@ npm install
 # serve with hot reload at localhost:8080
 npm run dev
 
+
+# mui打包失败原因：http://www.mamicode.com/info-detail-2520955.html
 # build for production with minification
 npm run build
 
@@ -1380,9 +1382,11 @@ addCart(){
 </script>
 ```
 
+## 22、部署到tomcat
 
+![image-20181201110046898](https://ws1.sinaimg.cn/large/006tNbRwgy1fxr2a6db2zj31440gotd7.jpg)
 
-
+https://blog.csdn.net/elisunli/article/details/79823245
 
 
 

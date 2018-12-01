@@ -76,10 +76,8 @@ module.exports = {
         }
       },
       { test: /\.scss$/, use: ['style-loader', 'css-loader', 'sass-loader'] }, // 处理 scss 文件的 loader
-      // {
-      //   test: /vue-preview.src.*?js$/,
-      //   loader: 'babel-loader'
-      // },
+      // { test: /\.css$/, use: ['style-loader', 'css-loader'] }, // 处理 CSS 文件的 loader
+      // { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] }, // 处理 less 文件的 loader
     ]
   },
   node: {
