@@ -10,10 +10,10 @@
     <!-- 图片列表区域 -->
     <ul class="photo-list">
       <router-link v-for="item in list" :key="item.id" :to="'/home/photoinfo/' + item.id" tag="li">
-        <img v-lazy="item.img_url">
+        <img v-lazy="item.imgUrl">
         <div class="info">
           <h1 class="info-title">{{ item.title }}</h1>
-          <div class="info-body">{{ item.zhaiyao }}</div>
+          <div class="info-body">{{ item.content | filterFun }}</div>
         </div>
       </router-link>
     </ul>
@@ -76,6 +76,15 @@
       this.getAllCate();
       this.getPicById(0);
     },
+    // 自定义过滤器
+    filters: {
+      filterFun: function (value) {
+        if(value&& value.length > 55) {
+          value= value.substring(0,55)+ '...';
+        }
+        return value;
+      }
+    }
   }
 </script>
 
@@ -96,6 +105,7 @@
     list-style: none; // 将· 删除
     margin: 0;
     padding: 28px 5px;
+    padding-bottom: 0;
 
     li {
       background-color: #ccc;

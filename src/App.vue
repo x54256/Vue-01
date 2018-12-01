@@ -1,7 +1,12 @@
 <template>
   <div id="app">
     <!--顶部Header区域-->
-    <mt-header title="鑫哥棒棒哒-Vue项目" fixed/>
+    <mt-header title="鑫哥棒棒哒-Vue项目" fixed>
+      <span slot="left" @click="goBack" v-show="flag">
+        <mt-button icon="back">返回</mt-button>
+      </span>
+    </mt-header>
+
 
     <!-- 中间路由router-view区域 -->
     <transition>
@@ -38,14 +43,31 @@ export default {
   name: 'App',
   data() {
     return {
-      cartNum: 0
+      flag: true
     }
   },
   methods: {
     addCartNum(num){
       this.cartNum += num;
       Toast("添加购物车成功！")
+    },
+    goBack(){
+      this.$router.go(-1)
     }
+  },
+  // 监视 路由 如果新的路由是 /home 则隐藏后退按钮
+  watch: {
+    "$route.path": function(newVal) {
+      if (newVal === "/home") {
+        this.flag = false;
+      } else {
+        this.flag = true;
+      }
+    }
+  },
+  // 上面有一个问题，就是在初始化的时候不会执行
+  created() {
+    this.flag = this.$route.path === "/home" ? false : true;
   }
 }
 </script>

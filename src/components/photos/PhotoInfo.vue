@@ -44,6 +44,13 @@
               title: 'Image Caption 1',
               w: 600,
               h: 400
+            },{
+              src: 'https://farm6.staticflickr.com/5591/15008867125_68a8ed88cc_b.jpg',
+              msrc: 'https://farm6.staticflickr.com/5591/15008867125_68a8ed88cc_m.jpg',
+              alt: 'picture1',
+              title: 'Image Caption 1',
+              w: 600,
+              h: 400
             },
             {
               src: 'https://farm4.staticflickr.com/3902/14985871946_86abb8c56f_b.jpg',
@@ -107,7 +114,7 @@
         justify-content: space-between; // 靠两边对其
         margin: 10px;
         figure {
-          width: 50%;
+          width: 33%;
           margin: 0;
           display: inline-block;
         }

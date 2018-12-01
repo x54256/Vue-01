@@ -4,6 +4,10 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 
+// vue插件的debug模式
+Vue.config.devtools = true
+
+
 // 按需导入组件，导入css
 // import { Header, Swipe, SwipeItem, Button } from 'mint-ui'
 import 'mint-ui/lib/style.css'
@@ -66,7 +70,7 @@ var store = new Vuex.Store({
     addToCar(state,obj){
       var flag = false;
 
-      // 对数组中的每个元素都执行一次指定的函数（callback），直到此函数返回 true，如果发现这个元素，some 将返回 true，如果回调函数对每个元素执行后都返回 false ，some 将返回 false。它只对数组中的非空元素执行指定的函数，没有赋值或者已经删除的元素将被忽略。
+      // some方法：对数组中的每个元素都执行一次指定的函数（callback），直到此函数返回 true，如果发现这个元素，some 将返回 true，如果回调函数对每个元素执行后都返回 false ，some 将返回 false。它只对数组中的非空元素执行指定的函数，没有赋值或者已经删除的元素将被忽略。
 
       // 1. 如果购物车中，之前就已经有这个对应的商品了，那么，只需要更新数量
       state.car.some(item => {
@@ -84,7 +88,30 @@ var store = new Vuex.Store({
       // 3.当更新car之后，把car数组，存储到本地的localStorage中
       localStorage.setItem('car', JSON.stringify(state.car))
 
+    },
+
+    updateItemNum(state,obj){
+
+      state.car.some(item => {
+        if (item.id === obj.id){
+          item.count = parseInt(obj.count);
+          return true;
+        }
+      });
+      localStorage.setItem('car', JSON.stringify(state.car))
+    },
+
+    removeItem(state,id){
+      state.car.some((item,i) => {  // i是当前循环的索引
+        if (item.id === id){
+          state.car.splice(i,1);
+          return true;
+        }
+      })
+
+      localStorage.setItem('car', JSON.stringify(state.car))
     }
+
   },
   getters: {
     getCount: function (state) {
@@ -95,7 +122,31 @@ var store = new Vuex.Store({
       });
 
       return num;
+    },
+
+    getCar: (state) => {
+      return state.car
+    },
+
+    getSeleectNumAndPrice: state => {
+
+      var info = {
+        count: 0,
+        amount: 0
+      };
+
+      state.car.forEach(x => {
+
+        if (x.selected === true) {
+          info.count += x.count;
+          info.amount += x.count * x.price
+        }
+      });
+
+      return info
     }
+
+
   }
 });
 

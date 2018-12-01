@@ -1,3 +1,7 @@
+/**
+ * 黄震哥的爬虫
+ * @type {"fs"}
+ */
 const fs = require('fs');//文件读写
 const https = require("https");
 const http = require("http");

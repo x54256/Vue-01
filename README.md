@@ -1250,3 +1250,141 @@ addCart(){
 </router-link>
 ```
 
+## 19、some方法的含义
+
+  some方法：对数组中的每个元素都执行一次指定的函数（callback），直到此函数返回 true，如果发现这个元素，some 将返回 true，如果回调函数对每个元素执行后都返回 false ，some 将返回 false。它只对数组中的非空元素执行指定的函数，没有赋值或者已经删除的元素将被忽略。
+
+## 20、购物车页面（商品部分）实现
+
+![image-20181201085003820](https://ws2.sinaimg.cn/large/006tNbRwgy1fxqyi651oaj30jq0yejvi.jpg)
+
+```vue
+<div class="shopcar-container">
+  <div class="shopcar-list">
+
+    <!-- 商品列表项区域 -->
+    <div class="mui-card">
+      <div class="mui-card-content">
+        <div class="mui-card-content-inner">
+
+          <mt-switch v-model="isSelected"></mt-switch>
+          <img src="https://m.360buyimg.com/babel/jfs/t7297/154/3413903491/65679/45ae4902/59e42830N9da56c41.jpg!q70.jpg">
+          <div class="info">
+            <h1>Apple iPhone X (A1865) 64GB 银色 移动联通电信4G手机</h1>
+
+
+              <div class="stepper">
+                <span class="price">￥6999.00</span>
+                <van-stepper v-model="selectedCount" />
+                <a href="#">删除</a>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style scoped lang="scss">
+  .shopcar-container{
+    .mui-card-content-inner {
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;  // 纵向居中
+
+      img {
+        height: 60px;
+        width: 60px;
+      }
+      .info {
+
+        /*display: flex;*/
+        /*flex-direction: column;*/
+        /*justify-content: space-between;*/
+
+        h1 {
+          font-size: 13px;
+        }
+        .price {
+          color: red;
+          font-weight: bold;
+        }
+      }
+
+    }
+  }
+
+</style>
+
+<style lang="scss">
+  .shopcar-container {
+    .stepper {
+      display: flex;
+      justify-content: space-between;
+      /*justify-content: flex-start;*/
+      text-align: left;
+      margin: 5px 0;
+      .van-stepper {
+        display: flex;
+        justify-content: space-between;
+        width: 100px;
+        height: 22px;
+        .van-stepper__input {
+          margin: 0;
+          padding: 0;
+          height: 20px;
+        }
+        button {
+          height: 100%;
+        }
+      }
+    }
+
+  }
+</style>
+```
+
+## 21、后退按钮实现
+
+```vue
+<div id="app">
+    <!--顶部Header区域-->
+    <mt-header title="鑫哥棒棒哒-Vue项目" fixed>
+      <span slot="left" @click="goBack" v-show="flag">
+        <mt-button icon="back">返回</mt-button>
+      </span>
+    </mt-header>
+    ...
+
+<script>
+  methods: {
+    goBack(){
+      this.$router.go(-1)
+    }
+  },
+  // 监视 路由 如果新的路由是 /home 则隐藏后退按钮
+  watch: {
+    "$route.path": function(newVal) {
+      if (newVal === "/home") {
+        this.flag = false;
+      } else {
+        this.flag = true;
+      }
+    }
+  },
+  // 上面有一个问题，就是在初始化的时候不会执行
+  created() {
+    this.flag = this.$route.path === "/home" ? false : true;
+  }
+</script>
+```
+
+
+
+
+
+
+
+
+
